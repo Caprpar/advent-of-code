@@ -14,31 +14,36 @@ def file_lines_to_list(file):
     return outputList
 
 
-spelled_digits = {
-    "zero": 0,
-    "one": 1,
-    "two": 2,
-    "three": 3,
-    "four": 4,
-    "five": 5,
-    "six": 6,
-    "seven": 7,
-    "eight": 8,
-    "nine": 9
-}
+def convert_to_digits(text):
+    '''Converts textformat "eightsixone" to [8, 6, 9]'''
+    valid_digits = {
+        "zero": 0,
+        "one": 1,
+        "two": 2,
+        "three": 3,
+        "four": 4,
+        "five": 5,
+        "six": 6,
+        "seven": 7,
+        "eight": 8,
+        "nine": 9
+    }
+    start_index = 0
+    stored_digits = []
+    for index, char in enumerate(file_input):
+        potential_digit = (file_input[start_index:index] + char)
 
+        if potential_digit in valid_digits.keys():
+            stored_digits.append(valid_digits[potential_digit])
+            start_index = index + 1
 
-# TODO make "eightsixone" to [8, 6, 9]
+    return stored_digits
+
+# 1.    Kolla så det är minst tre tecken kvar mellan start index och totala stränglängden,
+#       bara tre tecken kvar och ej en siffra, så får det vara slut
+# 2.    Har potential index nått upp till 5 karaktärer utan att matcha en siffra, öka start index med +1 och fortsätt
+
 
 file_input = "eightsixnine"
-start_index = 0
-stored_digits = []
-
-for index, char in enumerate(file_input):
-    potential_digit = (file_input[start_index:index] + char)
-
-    if potential_digit in spelled_digits.keys():
-        stored_digits.append(spelled_digits[potential_digit])
-        start_index = index + 1
-
-print(stored_digits)
+digits = convert_to_digits(file_input)
+print(digits)
