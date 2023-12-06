@@ -29,14 +29,40 @@ def convert_to_digits(text):
         "nine": 9
     }
     start_index = 0
+    end_index = 3
     stored_digits = []
-    for index, char in enumerate(file_input):
-        potential_digit = (file_input[start_index:index] + char)
+    iteration = 0
+    while True:
+        if start_index >= len(text):
+            break
+        current_char = text[start_index]
+        iteration += 1
+        potential_digit = (file_input[start_index:end_index])
 
-        if potential_digit in valid_digits.keys():
-            stored_digits.append(valid_digits[potential_digit])
-            start_index = index + 1
-
+        # Adds digit to list if it is a number
+        try:
+            int_value = int(current_char)
+            stored_digits.append(int_value)
+            start_index += 1
+            end_index = start_index + 3
+        except ValueError:
+            # If last three is'nt a digit break the loop
+            # if (len(text) - start_index <= 3) and potential_digit not in valid_digits.keys():
+            #     break
+            if (end_index == len(text)):
+                start_index += 1
+            # If the five digits dont match any digits from valid_digits
+            elif (len(potential_digit) > 5) and potential_digit not in valid_digits.keys():
+                start_index += 1
+                end_index = start_index + 3
+            # If the potential_digit match a valid digit
+            elif potential_digit in valid_digits.keys():
+                stored_digits.append(valid_digits[potential_digit])
+                start_index = end_index
+                end_index = start_index + 3
+            else:
+                end_index += 1
+    print(iteration)
     return stored_digits
 
 # 1.    Kolla så det är minst tre tecken kvar mellan start index och totala stränglängden,
@@ -45,5 +71,6 @@ def convert_to_digits(text):
 
 
 file_input = "eightsixnine"
+file_input = "7onevsffj78ninejcnnvgn65"
 digits = convert_to_digits(file_input)
 print(digits)
