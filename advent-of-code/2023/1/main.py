@@ -45,5 +45,5 @@ for calibration in calibration_list:
     calibration_values.append(get_calibration_value_from_encryption(calibration))
 
 sum_of_calibration_values = sum(calibration_values)
-input(sum_of_calibration_values)
+print(sum_of_calibration_values)
 
