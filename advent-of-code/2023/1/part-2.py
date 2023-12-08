@@ -1,76 +1,114 @@
 import os
-'''
-Grab first and last digits from "eightwothree" the result should be 83
-                                "6eight7six" should be 66
-'''
+import random
 
 
-def file_lines_to_list(file):
-    '''Return list which each index represent information from each row from a file'''
-    outputList = []
-    with open(file, "r") as file:
-        for line in file:
-            outputList.append(line.strip())
-    return outputList
+class Decoder:
+    """The decoder to solve all elfs problem"""
+
+    def __init__(self, filename="input.txt"):
+        """Initialize data and decoded_lst"""
+        self.filename = filename
+        self.codes = self.get_data()
+        self.decoded_lst = []
+        self.random_code = self.get_random_code()
+        self.valid_digits = {
+            "one": 1,
+            "two": 2,
+            "three": 3,
+            "four": 4,
+            "five": 5,
+            "six": 6,
+            "seven": 7,
+            "eight": 8,
+            "nine": 9
+        }
+
+    def get_data(self):
+        """Return list of data from each row of the filename"""
+        data = []
+        file = os.path.join(os.path.dirname(__file__), self.filename)
+        with open(file, "r") as file:
+            for line in file:
+                data.append(line.strip())
+        return data
+
+    def display_data(self):
+        """Display the list of data"""
+        print(self.data)
+
+    def get_random_code(self):
+        """Returns random code from the data list"""
+        random_code = random.choice(self.codes)
+        return random_code
+
+    def get_allowed_chars(self, character_amount=3):
+        '''gets the amount first chars from valid_digits to compare with the 
+        code to encrypt'''
+        char_list = []
+        # character_amount -= 1
+        for digit in self.valid_digits:
+            char_list.append(digit[0:character_amount])
+        return char_list
+
+    def convert_code(self, code):
+        """Returns digits from an encoded code like the example. 
+        5zspmjkssghgtgpdpg3threeseven ==> [5, 3, 3, 7] """
+        active = True
+        decoded_list = []
+
+        # Scan each char in sets of 3 then 4 then 5 to find out if the
+        # characters is a valid digit.
+        scan_len = 3
+        index = 0
+        while True:
+
+            # Break the loop when scanned through every character from the code
+            if index >= len(code):
+                break
+
+            current_char = code[index]
+
+            try:
+                int_input = int(current_char)
+                decoded_list.append(int_input)
+
+                index += 1  # Scan next char #TODO Can I convert this to a function?
+                scan_len = 3
+
+            except ValueError:
+                current_scanned_char = code[index: scan_len + index]
+                valid_scans = self.get_allowed_chars(scan_len)
+
+                # save decoded digit if the scanned char is a valid digit
+                if current_scanned_char in valid_scans and current_scanned_char in self.valid_digits:
+                    decoded_list.append(
+                        self.valid_digits[current_scanned_char])
+                    index += 1  # Scan next char
+                    scan_len = 3
+
+                # increase scan_len if the chars has a potential digit
+                elif current_scanned_char in valid_scans:
+                    scan_len += 1  # ! Start here on new programming session
+
+                # jump to next group of char to scan if current scan is invalid
+                else:
+                    index += 1
+
+        return decoded_list
+
+    def get_first_last_digit(self, decoded_list):
+        '''Returns first and last indexes added to eachother as an int 
+        [1,2,3] ==> 13 '''
+        output = str(decoded_list[0]) + str(decoded_list[-1])
+        return int(output)
+
+    def decode_data(self):
+        '''Decode data, as instructions from code of advent day 1 part 2'''
+        for code in self.codes:
+            decoded = self.convert_code(code)
+            self.decoded_lst.append(self.get_first_last_digit(decoded))
+        return sum(self.decoded_lst)
 
 
-def convert_to_digits(text):
-    '''Converts textformat "eightsixone" to [8, 6, 9]'''
-    valid_digits = {
-        "zero": 0,
-        "one": 1,
-        "two": 2,
-        "three": 3,
-        "four": 4,
-        "five": 5,
-        "six": 6,
-        "seven": 7,
-        "eight": 8,
-        "nine": 9
-    }
-    start_index = 0
-    end_index = 3
-    stored_digits = []
-    iteration = 0
-    while True:
-        if start_index >= len(text):
-            break
-        current_char = text[start_index]
-        iteration += 1
-        potential_digit = (file_input[start_index:end_index])
-
-        # Adds digit to list if it is a number
-        try:
-            int_value = int(current_char)
-            stored_digits.append(int_value)
-            start_index += 1
-            end_index = start_index + 3
-        except ValueError:
-            # If last three is'nt a digit break the loop
-            # if (len(text) - start_index <= 3) and potential_digit not in valid_digits.keys():
-            #     break
-            if (end_index == len(text)):
-                start_index += 1
-            # If the five digits dont match any digits from valid_digits
-            elif (len(potential_digit) > 5) and potential_digit not in valid_digits.keys():
-                start_index += 1
-                end_index = start_index + 3
-            # If the potential_digit match a valid digit
-            elif potential_digit in valid_digits.keys():
-                stored_digits.append(valid_digits[potential_digit])
-                start_index = end_index
-                end_index = start_index + 3
-            else:
-                end_index += 1
-    print(iteration)
-    return stored_digits
-
-# 1.    Kolla så det är minst tre tecken kvar mellan start index och totala stränglängden,
-#       bara tre tecken kvar och ej en siffra, så får det vara slut
-# 2.    Har potential index nått upp till 5 karaktärer utan att matcha en siffra, öka start index med +1 och fortsätt
-
-
-file_input = "eightsixnine"
-file_input = "7onevsffj78ninejcnnvgn65"
-digits = convert_to_digits(file_input)
-print(digits)
+decoder = Decoder()
+print(decoder.decode_data())
